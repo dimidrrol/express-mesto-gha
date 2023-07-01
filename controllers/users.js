@@ -15,7 +15,7 @@ const getUser = (req, res) => {
   User.findById(id)
     .then((user) => {
       if (!user) {
-        res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные создания пользователя' });
+        res.status(ERROR_CODE_404).send({ message: 'Пользователь не найден' });
         return;
       }
       res.send(user);
