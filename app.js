@@ -21,6 +21,4 @@ app.use(bodyParser.json());
 app.use('/users', usersRouter);
 app.use('/cards', cardRouter);
 
-app.listen(PORT, () => {
-  console.log(`hello ${PORT}`);
-});
+app.listen(PORT);

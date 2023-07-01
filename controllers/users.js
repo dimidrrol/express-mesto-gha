@@ -14,6 +14,10 @@ const getUser = (req, res) => {
 
   User.findById(id)
     .then((user) => {
+      if (!user) {
+        res.status(ERROR_CODE_404).send({ message: 'Пользователь не найден' });
+        return;
+      }
       res.send(user);
     })
     .catch((err) => {
@@ -41,8 +45,8 @@ const createUser = (req, res) => {
 const patchUser = (req, res) => {
   const id = req.user._id;
   const { name, about } = req.body;
-  User.findByIdAndUpdate(id, { name: name, about: about }, { new: true })
-    .then((user) => res.send({ data: user}))
+  User.findByIdAndUpdate(id, { name: name, about: about }, { new: true, runValidators: true })
+    .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные обновления пользователя' });
