@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const { PORT = 3000 } = process.env;
 const usersRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
+const helmet = require('helmet');
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(helmet());
 app.use(bodyParser.json());
 app.use('/users', usersRouter);
 app.use('/cards', cardRouter);

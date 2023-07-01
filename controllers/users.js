@@ -13,16 +13,15 @@ const getUser = (req, res) => {
   const { id } = req.params;
 
   User.findById(id)
+    .orFail(new Error('ValidationError'))
     .then((user) => {
-      if (!user) {
-        res.status(ERROR_CODE_404).send({ message: 'Пользователь не найден' });
-        return;
-      }
       res.send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные создания пользователя' });
+        res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные создания пользователя' });
+      } else if (err.message === 'ValidationError') {
+        res.status(ERROR_CODE_404).send({ message: 'Пользователь не найден' });
       } else {
         res.status(ERROR_CODE_500).send({ message: 'Произошла ошибка' });
       }
@@ -32,10 +31,10 @@ const getUser = (req, res) => {
 const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.status(201).send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные создания пользователя' });
+        res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные создания пользователя' });
       } else {
         res.status(ERROR_CODE_500).send({ message: 'Произошла ошибка' });
       }
@@ -49,9 +48,9 @@ const patchUser = (req, res) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные обновления пользователя' });
+        res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные обновления пользователя' });
       } else if (err.name === 'CastError') {
-        return res.status(ERROR_CODE_404).send({ message: 'Пользователь не найден' });
+        res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные обновления пользователя' });
       } else {
         res.status(ERROR_CODE_500).send({ message: 'Произошла ошибка' });
       }
@@ -61,13 +60,13 @@ const patchUser = (req, res) => {
 const patchUserAvatar = (req, res) => {
   const id = req.user._id;
   const { avatar } = req.body;
-  User.findByIdAndUpdate(id, { avatar: avatar }, { new: true })
+  User.findByIdAndUpdate(id, { avatar: avatar }, { new: true, runValidators: true })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные обновления аватара' });
+        res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные обновления аватара' });
       } else if (err.name === 'CastError') {
-        return res.status(ERROR_CODE_404).send({ message: 'Пользователь не найден' });
+        res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные обновления пользователя' });
       } else {
         res.status(ERROR_CODE_500).send({ message: 'Произошла ошибка' });
       }
