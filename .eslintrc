@@ -1,0 +1,15 @@
+{
+  "extends": "airbnb-base",
+  "rules": {
+    "no-underscore-dangle": [1, {
+      "allow": ["_id"]
+    }],
+    "comma-dangle": "off",
+    "@typescript-eslint/comma-dangle": "off",
+    "eol-last": ["error", "never"],
+    "import/newline-after-import": "off",
+    "no-console": "off",
+    "object-curly-newline": "off",
+    "arraysInObjects": false
+  }
+}
