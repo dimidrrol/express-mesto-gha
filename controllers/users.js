@@ -15,14 +15,14 @@ const getUser = (req, res) => {
   User.findById(id)
     .then((user) => {
       if (!user) {
-        res.status(ERROR_CODE_404).send({ message: 'Пользователь не найден' });
+        res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные создания пользователя' });
         return;
       }
       res.send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(ERROR_CODE_404).send({ message: 'Пользователь не найден' });
+        return res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные создания пользователя' });
       } else {
         res.status(ERROR_CODE_500).send({ message: 'Произошла ошибка' });
       }

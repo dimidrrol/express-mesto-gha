@@ -20,5 +20,17 @@ app.use((req, res, next) => {
 app.use(bodyParser.json());
 app.use('/users', usersRouter);
 app.use('/cards', cardRouter);
+app.use((err, req, res, next) => {
+  const isNotFound = err.message.indexOf('not found')
+  const isCastError = err.message.indexOf('Cast to ObjectId failed')
+  if (err.message && (isNotFound || isCastError)) {
+    return next()
+  }
+  res.status(500).send({messager: 'Произошла ошибка' })
+})
+
+app.use((req, res) => {
+  res.status(404).send({ message: 'Страница не найдена' });
+})
 
 app.listen(PORT);

@@ -16,7 +16,7 @@ const createCard = (req, res) => {
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные создания карточки' })
+        return res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные создания карточки' });
       } else {
         res.status(ERROR_CODE_500).send({ message: 'Произошла ошибка' });
       }
@@ -27,12 +27,16 @@ const deleteCard = (req, res) => {
   const { id } = req.params;
 
   Card.findByIdAndRemove(id)
-    .then((card) => {
-      res.send(card);
-    })
+  .then((card) => {
+    if (!card) {
+      res.status(ERROR_CODE_404).send({ message: 'Карточка не найдена' });
+      return;
+    }
+    res.send(card)
+  })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(ERROR_CODE_404).send({ message: 'Карточка не найдена' })
+        return res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные создания карточки' });
       } else {
         res.status(ERROR_CODE_500).send({ message: 'Произошла ошибка' });
       }
@@ -43,10 +47,16 @@ const likeCard = (req, res) => {
   const { id } = req.params;
   const userId = req.user._id;
   Card.findByIdAndUpdate(id, { $addToSet: { likes: userId }}, { new: true })
-    .then((card) => res.send(card))
+    .then((card) => {
+      if (!card) {
+        res.status(ERROR_CODE_404).send({ message: 'Карточка не найдена' });
+        return;
+      }
+      res.send(card)
+    })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(ERROR_CODE_404).send({ message: 'Карточка не найдена' })
+        return res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные карточки' });
       } else {
         res.status(ERROR_CODE_500).send({ message: 'Произошла ошибка' });
       }
@@ -56,10 +66,16 @@ const likeCard = (req, res) => {
 const dislikeCard = (req, res) => {
   const { id } = req.params;
   Card.findByIdAndUpdate(id, { $pull: { likes: req.user._id }}, { new: true})
-    .then((card) => res.send(card))
+    .then((card) => {
+      if (!card) {
+        res.status(ERROR_CODE_404).send({ message: 'Карточка не найдена' });
+        return;
+      }
+      res.send(card)
+    })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(ERROR_CODE_404).send({ message: 'Карточка не найдена' })
+        return res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные карточки' });
       } else {
         res.status(ERROR_CODE_500).send({ message: 'Произошла ошибка' });
       }
