@@ -41,7 +41,9 @@ const deleteCard = (req, res) => {
 
 const likeCard = (req, res) => {
   const { id } = req.params;
-  Card.findByIdAndUpdate(id, { $addToSet: { likes: req.user._id }}, { new: true })
+  const userId = req.user._id;
+  Card.findByIdAndUpdate(id, { $addToSet: { likes: userId }}, { new: true })
+    .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
         return res.status(ERROR_CODE_404).send({ message: 'Карточка не найдена' })
@@ -54,6 +56,7 @@ const likeCard = (req, res) => {
 const dislikeCard = (req, res) => {
   const { id } = req.params;
   Card.findByIdAndUpdate(id, { $pull: { likes: req.user._id }}, { new: true})
+    .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
         return res.status(ERROR_CODE_404).send({ message: 'Карточка не найдена' })
