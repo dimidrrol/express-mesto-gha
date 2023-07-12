@@ -5,34 +5,38 @@ const { PORT = 3000 } = process.env;
 const usersRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
 const helmet = require('helmet');
+const cookieParser = require('cookie-parser');
+const { createUser, login} = require('./controllers/users');
+const { auth } = require('./middlewares/auth');
+const { errors } = require('celebrate');
+const rateLimit = require('express-rate-limit');
+require('dotenv').config();
 
 const app = express();
 
-mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
-
-app.use((req, res, next) => {
-  req.user = {
-    _id: '649f1fd399d15724f773287c'
-  };
-
-  next();
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100
 });
 
+mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
+
+app.use(cookieParser());
 app.use(helmet());
 app.use(bodyParser.json());
+app.use(limiter);
+
+app.post('/signup', createUser);
+app.post('/signin', login);
+app.use(auth);
+
 app.use('/users', usersRouter);
 app.use('/cards', cardRouter);
-app.use((err, req, res, next) => {
-  const isNotFound = err.message.indexOf('not found')
-  const isCastError = err.message.indexOf('Cast to ObjectId failed')
-  if (err.message && (isNotFound || isCastError)) {
-    return next()
-  }
-  res.status(500).send({messager: 'Произошла ошибка' })
-})
 
-app.use((req, res) => {
-  res.status(404).send({ message: 'Страница не найдена' });
+app.use(errors());
+app.use((err, req, res, next) => {
+  const { statusCode = 500, message } = err;
+  res.status(statusCode).send({ message: statusCode === 500 ? 'На сервере произошла ошибка' : message });
 })
 
 app.listen(PORT);
