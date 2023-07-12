@@ -40,7 +40,7 @@ const createUser = (req, res, next) => {
   bcrypt.hash(password, 10)
     .then(hash => User.create({ name, about, avatar, email, password: hash }))
     .then((user) => {
-      const publicUser = { name: user.name, about: user.about, avatar: user.avatar, email: user.email};
+      const publicUser = { name: user.name, about: user.about, avatar: user.avatar, email: user.email };
       res.status(201).send(publicUser);
     })
     .catch((err) => {
@@ -83,6 +83,9 @@ const login = (req, res, next) => {
   const { email, password } = req.body;
   User.findOne({ email }).select('+password')
     .then((user) => {
+      if (!user) {
+        throw new UnauthorizedError('Неправильный email или пароль');
+      }
       return bcrypt.compare(password, user.password);
     })
     .then((matched) => {
