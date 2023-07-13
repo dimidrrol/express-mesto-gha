@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const { NODE_ENV, JWT_SECRET } = process.env;
 const NotFoundError = require('../errors/not-found-err');
 const UnauthorizedError = require('../errors/unauthorized-err');
+const ConflictError = require('../errors/conflict-err');
 
 const getUsers = (req, res, next) => {
   User.find({})
@@ -45,7 +46,7 @@ const createUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err.code === 11000) {
-        res.status(409).send({ message: 'Такой email уже зарегистрирован' });
+        next(new ConflictError('Такой email уже зарегистрирован'));
       } else {
         next(err);
       }

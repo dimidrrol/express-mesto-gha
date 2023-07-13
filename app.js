@@ -11,6 +11,7 @@ const { auth } = require('./middlewares/auth');
 const { errors } = require('celebrate');
 const rateLimit = require('express-rate-limit');
 const { validateUser, validateLogin } = require('./middlewares/validations');
+const errorHandler = require('./middlewares/error-handler');
 require('dotenv').config();
 
 const app = express();
@@ -34,13 +35,10 @@ app.use(auth);
 app.use('/users', usersRouter);
 app.use('/cards', cardRouter);
 
-app.use(errors());
-app.use((err, req, res, next) => {
-  const { statusCode = 500, message } = err;
-  res.status(statusCode).send({ message: statusCode === 500 ? 'На сервере произошла ошибка' : message });
-});
 app.use((req, res, next) => {
-  res.status(404).send({ message: 'Извините, такой страницы не существует'});
+  next(new NotFoundError('Маршрут не найден'));
 });
+app.use(errors());
+app.use(errorHandler);
 
 app.listen(PORT);
