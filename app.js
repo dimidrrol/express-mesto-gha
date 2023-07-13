@@ -12,6 +12,7 @@ const { errors } = require('celebrate');
 const rateLimit = require('express-rate-limit');
 const { validateUser, validateLogin } = require('./middlewares/validations');
 const errorHandler = require('./middlewares/error-handler');
+const NotFoundError = require('./errors/not-found-err');
 require('dotenv').config();
 
 const app = express();
