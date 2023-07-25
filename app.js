@@ -26,13 +26,14 @@ const limiter = rateLimit({
 
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
+app.use(cors);
+app.use(corsOptions);
 app.use(cookieParser());
 app.use(helmet());
 app.use(bodyParser.json());
 app.use(limiter);
 app.use(requestLogger);
-app.use(cors);
-app.use(corsOptions);
+
 
 app.post('/signup', validateUser, createUser);
 app.post('/signin', validateLogin, login);
