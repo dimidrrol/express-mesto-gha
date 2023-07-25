@@ -13,7 +13,11 @@ const rateLimit = require('express-rate-limit');
 const { validateUser, validateLogin } = require('./middlewares/validations');
 const errorHandler = require('./middlewares/error-handler');
 const NotFoundError = require('./errors/not-found-err');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 require('dotenv').config();
+const allowedCors = [
+  'localhost:3000'
+];
 
 const app = express();
 
@@ -28,6 +32,17 @@ app.use(cookieParser());
 app.use(helmet());
 app.use(bodyParser.json());
 app.use(limiter);
+app.use(requestLogger);
+
+app.use(function(req, res, next) {
+  const { origin } = req.headers;
+
+  if (allowedCors.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+
+  next();
+})
 
 app.post('/signup', validateUser, createUser);
 app.post('/signin', validateLogin, login);
@@ -36,6 +51,7 @@ app.use(auth);
 app.use('/users', usersRouter);
 app.use('/cards', cardRouter);
 
+app.use(errorLogger);
 app.use((req, res, next) => {
   next(new NotFoundError('Маршрут не найден'));
 });
