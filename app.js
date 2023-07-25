@@ -14,10 +14,8 @@ const { validateUser, validateLogin } = require('./middlewares/validations');
 const errorHandler = require('./middlewares/error-handler');
 const NotFoundError = require('./errors/not-found-err');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+const { cors, corsOptions } = require('./middlewares/cors');
 require('dotenv').config();
-const allowedCors = [
-  'localhost:3000'
-];
 
 const app = express();
 
@@ -33,16 +31,8 @@ app.use(helmet());
 app.use(bodyParser.json());
 app.use(limiter);
 app.use(requestLogger);
-
-app.use(function(req, res, next) {
-  const { origin } = req.headers;
-
-  if (allowedCors.includes(origin)) {
-    res.header('Access-Control-Allow-Origin', origin);
-  }
-
-  next();
-})
+app.use(cors);
+app.use(corsOptions);
 
 app.post('/signup', validateUser, createUser);
 app.post('/signin', validateLogin, login);
