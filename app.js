@@ -15,15 +15,7 @@ const errorHandler = require('./middlewares/error-handler');
 const NotFoundError = require('./errors/not-found-err');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { cors } = require('./middlewares/cors');
-const cors1 = require('cors');
 require('dotenv').config();
-const allowedCors = {
-  origin: [
-    'http://localhost:3000',
-    'https://localhost:3000',
-    'localhost:3000'
-  ]
-}
 
 const app = express();
 
@@ -38,7 +30,7 @@ app.use(cookieParser());
 app.use(helmet());
 app.use(bodyParser.json());
 app.use(limiter);
-app.use(cors1());
+app.use(cors);
 app.use(requestLogger);
 
 
