@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const { PORT = 3001 } = process.env;
+const { PORT = 3000 } = process.env;
 const usersRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
 const helmet = require('helmet');
