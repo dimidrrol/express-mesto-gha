@@ -31,7 +31,7 @@ app.use(helmet());
 app.use(bodyParser.json());
 app.use(limiter);
 app.use(requestLogger);
-app.use(cors);
+
 
 
 app.post('/signup', validateUser, createUser);
