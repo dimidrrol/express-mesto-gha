@@ -38,8 +38,8 @@ app.use(cookieParser());
 app.use(helmet());
 app.use(bodyParser.json());
 app.use(limiter);
-app.use(requestLogger);
 app.use(cors1());
+app.use(requestLogger);
 
 
 app.post('/signup', validateUser, createUser);
